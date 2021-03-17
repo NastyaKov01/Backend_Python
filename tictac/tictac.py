@@ -1,16 +1,22 @@
 """Tic-tac-toe game realisation"""
 
+from enum import Enum
+
+
+class Players(Enum):
+    """Players ids"""
+    Player1 = 1
+    Player2 = 2
+
 
 class WrongInp(Exception):
     """New exception class for invalid user input:
         invalid data format"""
-    pass
 
 
 class Occupied(Exception):
     """New exception class for invalid user input:
-    position is occupied"""
-    pass
+        position is occupied"""
 
 
 class TicTacGame:
@@ -22,6 +28,7 @@ class TicTacGame:
         self.board = [['_' for i in range(3)] for k in range(3)]
         self.pos_coords = [0, 0]
         self.correct_inp = False
+        self.occupied_num = 0
 
     def show_board(self):
         """Printing th game board"""
@@ -65,25 +72,24 @@ class TicTacGame:
     def play_game(self):
         """Main method: playing"""
 
-        order = 1
+        order = Players.Player1
         while self.check_winner(self.board) is False:
-            full = True
-            for i in range(3):
-                for j in range(3):
-                    if self.board[i][j] == '_':
-                        full = False
-            if full is True and self.check_winner(self.board) is False:
+            if self.occupied_num == 9 and self.check_winner(self.board) is False:
                 return "It is a draw!"
             self.read_coords()
-            if order == 1:
+            if order == Players.Player1:
                 self.board[self.pos_coords[0]][self.pos_coords[1]] = 'x'
-                order = 2
-            elif order == 2:
+                order = Players.Player2
+                self.occupied_num += 1
+            elif order == Players.Player2:
                 self.board[self.pos_coords[0]][self.pos_coords[1]] = 'o'
-                order = 1
+                order = Players.Player1
+                self.occupied_num += 1
             self.show_board()
             self.correct_inp = False
-        if order == 1:
+        #It's Player1's move, but the game finished.
+        #It means that Player2 made the previous move and he is the winner.
+        if order == Players.Player1:
             return "Player 2 won the game!"
         return "Player 1 won the game!"
 
@@ -97,24 +103,28 @@ class TicTacGame:
         print("The first Player plays with crosses")
         print(self.play_game())
 
-    def check_winner(self, resboard):
+    @staticmethod
+    def check_winner(resboard):
         """Result is checked"""
 
-        win = False
         for i in range(3):
+            #rows checked
             if resboard[i][0] == resboard[i][1] and resboard[i][1] == resboard[i][2]:
                 if resboard[i][0] != '_':
-                    win = True
+                    return True
+            #columns checked
             if resboard[0][i] == resboard[1][i] and resboard[1][i] == resboard[2][i]:
                 if resboard[0][i] != '_':
-                    win = True
+                    return True
+        #main diagonal checked
         if resboard[0][0] == resboard[1][1] and resboard[1][1] == resboard[2][2]:
             if resboard[0][0] != '_':
-                win = True
+                return True
+        #second diagonal checked
         if resboard[0][2] == resboard[1][1] and resboard[1][1] == resboard[2][0]:
             if resboard[0][2] != '_':
-                win = True
-        return win
+                return True
+        return False
 
 
 if __name__ == '__main__':

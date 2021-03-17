@@ -16,6 +16,7 @@ class TestCases(unittest.TestCase):
 
         self.assertEqual(self.game.pos_coords, [0, 0])
         self.assertFalse(self.game.correct_inp)
+        self.assertEqual(self.game.occupied_num, 0)
         for i in range(3):
             for j in range(3):
                 with self.subTest(i=i, j=j):
@@ -49,6 +50,7 @@ class TestCases(unittest.TestCase):
         self.game.board[1][2] = self.game.board[2][0] = 'x'
         self.game.board[0][2] = self.game.board[1][0] = 'o'
         self.game.board[1][1] = self.game.board[2][1] = self.game.board[2][2] = 'o'
+        self.game.occupied_num = 9
         self.assertEqual(self.game.play_game(), "It is a draw!")
 
     def test_win_check(self):
