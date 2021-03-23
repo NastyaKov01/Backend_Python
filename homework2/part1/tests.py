@@ -1,10 +1,13 @@
+"""Test unit"""
 import unittest
 from copy import copy
 from customlist import CustomList
 
 class TestCases(unittest.TestCase):
+    """Testing class"""
 
     def setUp(self):
+        """Initial instructions"""
         self.lst1 = [1, 2, 3, 4, 5, 6, 7]
         self.lst2 = CustomList([-5, -10, 0])
         self.lst3 = CustomList()
@@ -13,6 +16,7 @@ class TestCases(unittest.TestCase):
         self.lst4 = CustomList((29, 100, 89, 2, -9))
 
     def test_init(self):
+        """Initialization test"""
         self.assertEqual(type(self.lst1), type(list()))
         self.assertEqual(type(self.lst2), type(CustomList()))
         self.assertEqual(type(self.lst3), type(CustomList()))
@@ -23,6 +27,7 @@ class TestCases(unittest.TestCase):
         self.assertEqual(len(self.lst4), 5)
 
     def test_add(self):
+        """Addition operator test"""
         cpy1 = copy(self.lst1)
         cpy2 = copy(self.lst2)
         cpy3 = copy(self.lst3)
@@ -41,8 +46,9 @@ class TestCases(unittest.TestCase):
         self.assertEqual(self.lst2, cpy2)
         self.assertEqual(self.lst3, cpy3)
         self.assertEqual(type(res), type(CustomList()))
-       
+
     def test_sub(self):
+        """Subtraction operator test"""
         cpy1 = copy(self.lst1)
         cpy2 = copy(self.lst2)
         cpy4 = copy(self.lst4)
@@ -63,6 +69,7 @@ class TestCases(unittest.TestCase):
         self.assertEqual(type(res), type(CustomList()))
 
     def test_comp(self):
+        """Comparison operators test"""
         self.assertTrue(self.lst1 != self.lst2)
         self.assertTrue(self.lst2 == self.lst2)
         self.assertTrue(self.lst1 < self.lst4)
