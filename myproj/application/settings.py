@@ -38,6 +38,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'books',
+    'authors',
+    'genres',
 ]
 
 MIDDLEWARE = [
@@ -76,13 +78,8 @@ WSGI_APPLICATION = 'application.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE' : 'django.db.backends.sqlite3',
-
-        #'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': BASE_DIR / 'db.sqlite3',
-        #'NAME': 'new_bd',
-        #'USER': 'new_user',
-
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'new_bd',
     }
 }
 
