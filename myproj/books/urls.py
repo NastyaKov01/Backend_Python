@@ -5,8 +5,8 @@ from books.views import get_details
 from books.views import index
 
 urlpatterns = [
-    path('<str:book_title>/<str:book_author>/<int:pub_year>/<int:book_price>/', create, name='create'),
-    path('booklist/', get_list, name='get_list'),
-    path('<int:book_id>/', get_details, name='get_details'),
     path('', index, name='index'),
+    path('create/', create, name='create'),
+    path('list/', get_list, name='get_list'),
+    path('<int:id>/', get_details, name='get_details'),
 ]

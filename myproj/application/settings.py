@@ -76,8 +76,13 @@ WSGI_APPLICATION = 'application.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
+        'ENGINE' : 'django.db.backends.sqlite3',
+
+        #'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': BASE_DIR / 'db.sqlite3',
+        #'NAME': 'new_bd',
+        #'USER': 'new_user',
+
     }
 }
 
@@ -104,7 +109,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/3.1/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'ru-Ru'
 
 TIME_ZONE = 'UTC'
 

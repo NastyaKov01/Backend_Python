@@ -1,35 +1,49 @@
 from django.http import JsonResponse
 from django.shortcuts import render
+from django.views.decorators.csrf import csrf_exempt
 from books.models import Book
 
-if len(Book.objects.all()) == 0:
-    book = Book.objects.create(title="Harry Potter", author="J.K.Rowling",
-                                   year=1997, price=45)
-    book = Book.objects.create(title="The Lord of the Rings", author="John R.R.Tolkien",
-                                   year=1948, price=50)
-    book = Book.objects.create(title="The Chronicals of Narnia", author="C.S.Lewis",
-                                   year=1950, price=60)
-    book = Book.objects.create(title="Alice in Wonderland", author="Lewis Carroll",
-                                   year=1865, price=57)
+books = [{"id":1, "title":"Гарри Поттер", "author":"Дж.К.Роулинг", "year":1997, "price":45},
+        {"id":2, "title":"Властилин колец", "author":"Дж.Р.Р.Толкин", "year":1948, "price":50},
+        {"id":3, "title":"Хроники Нарнии", "author":"К.С.Льюис", "year": 1950, "price": 60},
+        {"id":4, "title":"Алиса в Стране чудес", "author":"Л.Кэрролл", "year":1865, "price": 55}]
 
-def create(request, book_title, book_author, pub_year, book_price):
-    if request.method == "POST":
-        book = Book.objects.create(title=book_title, author=book_author,
-                                   year=pub_year, price=book_price)
-        return JsonResponse({"Event": "New book added", "Book id": book.id, "status": 201})
+@csrf_exempt
+def create(request):
+   if request.method == "POST":
+        book = {"id": request.POST.get("id"), "title": request.POST.get("title"), "author": request.POST.get("author"),
+            "year": request.POST.get("year"), "price": request.POST.get("price")}
+        try:
+            book["id"] = int(book["id"])
+            book["year"] = int(book["year"])
+            book["price"] = int(book["price"])
+        except ValueError:
+            return JsonResponse({"status": "404 страница не найдена"})
+        if type(book["id"]) == int and type(book["title"]) == str and type(book["author"]) == str \
+                    and type(book["year"]) == int and type(book["price"]) == int:
+            books.append(book)
+            return JsonResponse({"Event": "Новая книга добавлена", "status": 201})
+   return JsonResponse({"status": "404 страница не найдена"})
 
 def get_list(request):
     if request.method == "GET":
-        return JsonResponse({'data': [{'id': book.id, 'status': book.title} for book in Book.objects.all()]})
+        return JsonResponse({"data": [{"id": book["id"], "status": book["title"]} for book in books]})
+    return JsonResponse({"status": "404 страница не найдена"})
 
-def get_details(request, book_id):
+def get_details(request, id):
     if request.method == "GET":
-        try:
-            b = Book.objects.get(id=book_id)
-        except Book.DoesNotExist:
-            return JsonResponse({"status": "No such book"})
-        return JsonResponse({'Book id': b.id, 'Title': b.title, 'Author': b.author,
-                             'Year of first publication': b.year, 'Price': b.price})
+        found_book = 0
+        for book in books:
+            if book["id"] == id:
+                found_book = book
+        if found_book != 0:
+            return JsonResponse({'ID книги': found_book["id"], 'Название книги': found_book["title"],
+                        'Автор': found_book["author"], 'Год публикации': found_book["year"],
+                        'Цена': found_book["price"]})
+        return JsonResponse({"status": "404 станица не найдена"})
+    return JsonResponse({"status": "404 страница не найдена"})
 
 def index(request):
-    return render(request, 'books/index.html')
+    if request.method == "GET":
+        return render(request, 'books/index.html')
+    return JsonResponse({"status": "404 страница не найдена"})
