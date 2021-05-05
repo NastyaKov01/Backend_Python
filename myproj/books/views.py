@@ -22,8 +22,11 @@ def create(request):
     except Author.DoesNotExist:
         auth = Author.objects.create(name=b_auth)
     new_book.author = auth
-    for gnr in book.get("genres").split(" "):
-        gnr = gnr.replace(",", "")
+    for gnr in book.get("genres").split(","):
+        if gnr.startswith(" "):
+            gnr = gnr[1:]
+        if gnr.endswith(" "):
+            gnr = gnr[:-1]
         try:
             genre = Genre.objects.get(name=gnr)
         except Genre.DoesNotExist:

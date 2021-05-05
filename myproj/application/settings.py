@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'books',
     'authors',
     'genres',
+    'users'
 ]
 
 MIDDLEWARE = [
@@ -72,6 +73,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'application.wsgi.application'
 
+AUTH_USER_MODEL = "users.User"
 
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
