@@ -6,109 +6,125 @@ from books.models import Book
 from genres.models import Genre
 from authors.models import Author
 
-@csrf_exempt
-@require_POST
-def create(request):
-    book = request.POST
-    if Book.objects.filter(title=book.get("title")).exists():
-        return JsonResponse({"status": "Такая книга уже существует"}, status=406)
-    b_auth = book.get("author")
-    new_book = Book.objects.create(
-                title=book.get("title"),
-                year=book.get("year"),
-                price=book.get("price"))
-    try:
-        auth = Author.objects.get(name=b_auth)
-    except Author.DoesNotExist:
-        auth = Author.objects.create(name=b_auth)
-    new_book.author = auth
-    for gnr in book.get("genre").split(","):
-        if gnr.startswith(" "):
-            gnr = gnr[1:]
-        if gnr.endswith(" "):
-            gnr = gnr[:-1]
-        try:
-            genre = Genre.objects.get(name=gnr)
-        except Genre.DoesNotExist:
-            genre = Genre.objects.create(name=gnr)
-        new_book.genre.add(genre)
-    new_book.save()
-    return JsonResponse({"status": "201 Книга добавлена", "id": new_book.id}, status=201)
+from books.serializers import BookSerializer
+from rest_framework import viewsets
 
-@require_GET
-def get_list(request):
-    books = Book.objects.all()
-    data = [{"id": book.id, "Название": book.title} for book in books]
-    return JsonResponse({"Список книг": data}, status=200)
 
-@require_GET
-def get_details(request, id):
-    try:
-        book = Book.objects.get(id=id)
-    except Book.DoesNotExist:
-        return JsonResponse({"status": "страница не найдена"}, status=404)
-    gnr = [genre.name for genre in book.genre.all()]
-    res = {"id": book.id,
-           "Название книги": book.title,
-           "Автор книги": book.author.name,
-           "Жанры книги": gnr,
-           "Год публикации": book.year,
-           "Цена": book.price}
-    return JsonResponse(res, status=200)
+class BookViewSet(viewsets.ModelViewSet):
+    serializer_class = BookSerializer
+    queryset = Book.objects.all()
 
-@csrf_exempt
-@require_http_methods(["DELETE"])
-def remove(request, id):
-    try:
-        book = Book.objects.get(id=id)
-    except Book.DoesNotExist:
-        return JsonResponse({"status": "Книга не найдена"}, status=404)
-    book.delete()
-    return JsonResponse({"result":"Книга удалена"}, status=200)
 
-@csrf_exempt
-@require_http_methods(["PUT"])
-def change(request, id):
-    params = dict()
-    string = request.readline()
-    while string != b"":
-        tmp = string.decode('utf-8').split(":")
-        if len(tmp) != 1:
-            params[tmp[0]] = tmp[1].replace("\n", "")
-        string = request.readline()
-    print(params)
-    try:
-        book = Book.objects.get(id=id)
-    except Book.DoesNotExist:
-        return JsonResponse({"status": "Книга не найдена"}, status=404)
-    print(book)
-    book.title = params["title"]
-    b_auth = params["author"]
-    book.year = params["year"]
-    book.price = params["price"]
-    try:
-        auth = Author.objects.get(name=b_auth)
-    except Author.DoesNotExist:
-        auth = Author.objects.create(name=b_auth)
-    book.author = auth
-    for gnr in book.genre.all():
-        book.genre.remove(gnr)
-    for gnr in params["genre"].split(","):
-        if gnr.startswith(" "):
-            gnr = gnr[1:]
-        if gnr.endswith(" "):
-            gnr = gnr[:-1]
-        try:
-            genre = Genre.objects.get(name=gnr)
-        except Genre.DoesNotExist:
-            genre = Genre.objects.create(name=gnr)
-        book.genre.add(genre)
-    book.save()
-    return JsonResponse({"status":"Книга изменена"}, status=200)
 
-@require_GET
-def index(request):
-    return render(request, 'books/index.html')
+# @csrf_exempt
+# @require_POST
+# def create(request):
+#     book = request.POST
+#     if Book.objects.filter(title=book.get("title")).exists():
+#         return JsonResponse({"status": "Такая книга уже существует"}, status=406)
+#     b_auth = book.get("author")
+#     new_book = Book.objects.create(
+#                 title=book.get("title"),
+#                 year=book.get("year"),
+#                 price=book.get("price"))
+#     try:
+#         auth = Author.objects.get(name=b_auth)
+#     except Author.DoesNotExist:
+#         auth = Author.objects.create(name=b_auth)
+#     new_book.author = auth
+#     for gnr in book.get("genre").split(","):
+#         if gnr.startswith(" "):
+#             gnr = gnr[1:]
+#         if gnr.endswith(" "):
+#             gnr = gnr[:-1]
+#         try:
+#             genre = Genre.objects.get(name=gnr)
+#         except Genre.DoesNotExist:
+#             genre = Genre.objects.create(name=gnr)
+#         new_book.genre.add(genre)
+#     new_book.save()
+#     return JsonResponse({"status": "201 Книга добавлена", "id": new_book.id}, status=201)
+#
+# @require_GET
+# def get_list(request):
+#     books = Book.objects.all()
+#     data = [{"id": book.id, "Название": book.title} for book in books]
+#     return JsonResponse({"Список книг": data}, status=200)
+#
+# @require_GET
+# def get_details(request, id):
+#     try:
+#         book = Book.objects.get(id=id)
+#     except Book.DoesNotExist:
+#         return JsonResponse({"status": "страница не найдена"}, status=404)
+#     gnr = [genre.name for genre in book.genre.all()]
+#     res = {"id": book.id,
+#            "Название книги": book.title,
+#            "Автор книги": book.author.name,
+#            "Жанры книги": gnr,
+#            "Год публикации": book.year,
+#            "Цена": book.price}
+#     return JsonResponse(res, status=200)
+#
+# @csrf_exempt
+# @require_http_methods(["DELETE"])
+# def remove(request, id):
+#     try:
+#         book = Book.objects.get(id=id)
+#     except Book.DoesNotExist:
+#         return JsonResponse({"status": "Книга не найдена"}, status=404)
+#     book.delete()
+#     return JsonResponse({"result":"Книга удалена"}, status=200)
+#
+# @csrf_exempt
+# @require_http_methods(["PUT"])
+# def change(request, id):
+#     params = dict()
+#     print(repr(request))
+#     print(request.headers)
+#     print(dir(request))
+#     string = request.readline()
+#     while string != b"":
+#         tmp = string.decode('utf-8').split(":")
+#         if len(tmp) != 1:
+#             params[tmp[0]] = tmp[1].replace("\n", "")
+#         string = request.readline()
+#     print(params)
+#     try:
+#         book = Book.objects.get(id=id)
+#     except Book.DoesNotExist:
+#         return JsonResponse({"status": "Книга не найдена"}, status=404)
+#     print(book)
+#     book.title = params["title"]
+#     b_auth = params["author"]
+#     book.year = params["year"]
+#     book.price = params["price"]
+#     try:
+#         auth = Author.objects.get(name=b_auth)
+#     except Author.DoesNotExist:
+#         auth = Author.objects.create(name=b_auth)
+#     book.author = auth
+#     for gnr in book.genre.all():
+#         book.genre.remove(gnr)
+#     for gnr in params["genre"].split(","):
+#         if gnr.startswith(" "):
+#             gnr = gnr[1:]
+#         if gnr.endswith(" "):
+#             gnr = gnr[:-1]
+#         try:
+#             genre = Genre.objects.get(name=gnr)
+#         except Genre.DoesNotExist:
+#             genre = Genre.objects.create(name=gnr)
+#         book.genre.add(genre)
+#     book.save()
+#     return JsonResponse({"status":"Книга изменена"}, status=200)
+#
+# @require_GET
+# def index(request):
+#     return render(request, 'books/index.html')
+
+
+
 
 # books = [{"id":1, "title":"Гарри Поттер", "author":"Дж.К.Роулинг", "year":1997, "price":45},
 #         {"id":2, "title":"Властилин колец", "author":"Дж.Р.Р.Толкин", "year":1948, "price":50},

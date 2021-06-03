@@ -15,11 +15,27 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import include, path
+from rest_framework.routers import DefaultRouter
+from authors.views import AuthorViewSet
+from genres.views import GenreViewSet
+from books.views import BookViewSet
+from users.views import UserViewSet
+from users.views import submit, after_submit
+
+router = DefaultRouter()
+router.register(r'authors', AuthorViewSet, basename='authors')
+router.register(r'genres', GenreViewSet, basename='genres')
+router.register(r'books', BookViewSet, basename='books')
+router.register(r'users', UserViewSet, basename='users')
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('books/', include('books.urls')),
-    path('genres/', include('genres.urls')),
-    path('authors/', include('authors.urls')),
-    path('users/', include('users.urls')),
+    #path('books/', include('books.urls')),
+    #path('genres/', include('genres.urls')),
+    #path('authors/', include('authors.urls')),
+    #path('users/', include('users.urls')),
+    path('users/submit/', submit, name='submit'),
+    path('all_right/', after_submit, name='after_submit')
 ]
+
+urlpatterns += router.urls
