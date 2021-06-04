@@ -4,6 +4,7 @@ from genres.serializers import GenreSerializer
 from authors.serializers import AuthorSerializer
 from authors.models import Author
 from genres.models import Genre
+from books.tasks import mail_to_admin
 
 class BookSerializer(serializers.ModelSerializer):
     author = AuthorSerializer()
@@ -29,6 +30,7 @@ class BookSerializer(serializers.ModelSerializer):
                 genre = Genre.objects.create(name=name)
             book.genre.add(genre)
         book.save()
+        mail_to_admin.delay()
         return book
 
     def update(self, instance, validated_data):

@@ -27,6 +27,20 @@ DEBUG = False
 
 ALLOWED_HOSTS = ['*']
 
+# email server config
+EMAIL_HOST = 'smtp.googlemail.com'
+EMAIL_PORT = 465
+EMAIL_USE_TLS = False
+EMAIL_USE_SSL = True
+
+# administrator list
+ADMINS = [("admin", "nastenkakov29@gmail.com")]
+
+# Celery Configuration Options
+CELERY_TIMEZONE = "Europe/Moscow"
+CELERY_TASK_TRACK_STARTED = True
+CELERY_TASK_TIME_LIMIT = 30 * 60
+CELERY_BROKER_URL = "redis://localhost"
 
 # Application definition
 
@@ -41,7 +55,9 @@ INSTALLED_APPS = [
     'books',
     'authors',
     'genres',
-    'users'
+    'users',
+    'django_celery_beat',
+    'django_celery_results',
 ]
 
 MIDDLEWARE = [
